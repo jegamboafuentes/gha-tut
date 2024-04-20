@@ -12,7 +12,6 @@ jobs:
   check_that_payment:
     runs-on: ubuntu-latest
     steps:
-  
       - name: Echo Confirmation
         run: echo "review requested or review removed"
 
@@ -40,7 +39,7 @@ jobs:
         if: steps.check_payment.outputs.is_paid == 'true'
         run: |
           echo "Payment is confirmed. Proceeding with the review request."
-      
+
       - name: Contrib HAS paid
         if: steps.check_payment.outputs.is_paid == 'true'
         uses: actions/github-script@v6
@@ -54,7 +53,7 @@ jobs:
                 issue_number: context.issue.number,
                 body: message
               });
-      
+
       - name: Contrib has NOT paid
         if: steps.check_payment.outputs.is_paid == 'false'
         uses: actions/github-script@v6
@@ -68,8 +67,8 @@ jobs:
                 issue_number: context.issue.number,
                 body: message
               });
-            
-      - name: If paid launch hit openai 
+
+      - name: If paid launch hit openai
         if: steps.check_payment.outputs.is_paid == 'true'
         uses: actions/github-script@v6
         with:
@@ -115,7 +114,6 @@ jobs:
                 body: 'An error occurred while generating the response from OpenAI.'
               });
             }
-
 
     # github.pulls.dismissReviewRequest({
     #   owner: context.repo.owner,

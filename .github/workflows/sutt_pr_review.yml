@@ -1,4 +1,4 @@
-name: Contirbutor requests review: Check payment
+name: Contirbutor requests review - Check payment
 
 on:
   pull_request_target:

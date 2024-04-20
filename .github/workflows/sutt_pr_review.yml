@@ -68,52 +68,93 @@ jobs:
                 body: message
               });
 
-      - name: If paid launch hit openai
-        if: steps.check_payment.outputs.is_paid == 'true'
-        uses: actions/github-script@v6
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          # OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          script: |
+          python-version: '3.8'
 
-            const axios = require('axios');
-            const apiKey = '${{ secrets.OPENAI_API_KEY }}';
-            const prompt = 'Q: What is the largest planet? A:';
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
 
-            try {
-              const response = await axios.post('https://api.openai.com/v1/completions', 
-              {
-                model: 'text-davinci-002',
-                prompt: prompt,
-                max_tokens: 100,
-                n: 1,
-                stop: null,
-                temperature: 0.7        }, 
-                {
-                  headers: {
-                    'Authorization': `Bearer ${apiKey}`,
-                    'Content-Type': 'application/json'
-                  }    
-                }
-              );
+      - name: Call OpenAI API
+        id: openai_request
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          import requests
+          import json
 
-              const message = response.choices[0].text.trim();
+          url = "https://api.openai.com/v1/engines/davinci-codex/completions"
+          headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {OPENAI_API_KEY}"
+          }
+          data = {
+            "prompt": "Translate the following English text to French: 'Hello, how are you?'",
+            "max_tokens": 60
+          }
 
-              github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: message
-              });
-            } catch (error) {
-              console.error('Error:', error);
-              github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: 'An error occurred while generating the response from OpenAI.'
-              });
-            }
+          response = requests.post(url, json=data, headers=headers)
+          completion = response.json()["choices"][0]["text"]
+          print("Completion:", completion)
+
+          # Write to GITHUB_ENV
+          with open(os.getenv('GITHUB_ENV'), 'a') as f:
+              f.write(f"COMPLETION={json.dumps(completion)}\n")
+
+      - name: Use Completion Data
+        run: |
+          echo "The completion data is: $COMPLETION"
+      
+      # - name: If paid launch hit openai
+      #   if: steps.check_payment.outputs.is_paid == 'true'
+      #   uses: actions/github-script@v6
+      #   with:
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     # OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      #     script: |
+
+      #       const axios = require('axios');
+      #       const apiKey = '${{ secrets.OPENAI_API_KEY }}';
+      #       const prompt = 'Q: What is the largest planet? A:';
+
+      #       try {
+      #         const response = await axios.post('https://api.openai.com/v1/completions', 
+      #         {
+      #           model: 'text-davinci-002',
+      #           prompt: prompt,
+      #           max_tokens: 100,
+      #           n: 1,
+      #           stop: null,
+      #           temperature: 0.7        }, 
+      #           {
+      #             headers: {
+      #               'Authorization': `Bearer ${apiKey}`,
+      #               'Content-Type': 'application/json'
+      #             }    
+      #           }
+      #         );
+
+      #         const message = response.choices[0].text.trim();
+
+      #         github.rest.issues.createComment({
+      #           owner: context.repo.owner,
+      #           repo: context.repo.repo,
+      #           issue_number: context.issue.number,
+      #           body: message
+      #         });
+      #       } catch (error) {
+      #         console.error('Error:', error);
+      #         github.rest.issues.createComment({
+      #           owner: context.repo.owner,
+      #           repo: context.repo.repo,
+      #           issue_number: context.issue.number,
+      #           body: 'An error occurred while generating the response from OpenAI.'
+      #         });
+      #       }
 
     # github.pulls.dismissReviewRequest({
     #   owner: context.repo.owner,

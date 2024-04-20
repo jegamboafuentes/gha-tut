@@ -4,7 +4,6 @@ name: Run pytest on PR files
     types:
       - opened
     branches:
-      - master
       - mike-branch
 jobs:
   basic_pytest:

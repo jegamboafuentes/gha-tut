@@ -13,3 +13,15 @@ jobs:
         run: |
           ls -R
 
+      - name: make request
+        env:
+          INVOICE_KEY: ${{ secrets.INVOICE_KEY_1 }}
+        run: |
+          response=$(curl -s -X POST \
+              -H "X-Api-Key: $INVOICE_KEY" \
+              -H "Content-Type: application/json" \
+              -d '{"out": false, "amount": 10, "memo": "okok"}'
+              https://d5aedbf627.d.voltageapp.io/api/v1/payments)
+          echo "Server response:"
+          echo "$response"
+

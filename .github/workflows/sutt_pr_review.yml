@@ -42,7 +42,7 @@ jobs:
           echo "Payment is confirmed. Proceeding with the review request."
       
       - name: Contrib HAS paid
-        if: steps.check_payment.outputs.is_paid == 'false'
+        if: steps.check_payment.outputs.is_paid == 'true'
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}

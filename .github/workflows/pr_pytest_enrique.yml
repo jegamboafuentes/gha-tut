@@ -16,10 +16,10 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            const message = "Hola mundo";
+            const message = "Hola mundo 2.1";
             github.rest.issues.createComment({
               owner: "MIT-Bitcoin-2024",
               repo: "gha-tut",
               issue_number: "1",
               body: message
-            });
+            }); 

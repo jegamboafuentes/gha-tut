@@ -5,7 +5,7 @@ on:
     types: [opened]  
 
 jobs:
-  make request:
+  make_request:
     runs-on: ubuntu-latest
     steps:
   

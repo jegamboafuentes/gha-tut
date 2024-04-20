@@ -1,8 +1,8 @@
-name: Review - Check Payment
+name: Review - Check Payment 1
 
 on:
   pull_request_review:
-    types: [submitted]
+    types: [submitted, ]
 
 # permissions:
 #   issues: write
@@ -14,4 +14,4 @@ jobs:
     steps:
   
       - name: Hello World Step
-        run: echo "Hello, World!"
+        run: echo "review submitted/edited/dismissed"

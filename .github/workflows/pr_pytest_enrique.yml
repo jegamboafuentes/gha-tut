@@ -1,0 +1,79 @@
+name: Run pytest on PR files
+
+on:
+  pull_request_target:
+    types: [opened]  
+
+jobs:
+  basic_pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: list files
+        run: |
+          ls -R
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+
+      - name: List files in the directory
+        run: |
+          ls -R
+
+      - name: ENRIQUE BTC TREE
+        run: |
+          tree
+          
+      # - name: Run tests222
+      #   run: |
+      #     pytest -vv tests
+  
+  basic_lime:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: list files
+        run: |
+          ls -R
+
+      # - name: Set up Python
+      #   uses: actions/setup-python@v2
+      #   with:
+      #     python-version: 3.8
+
+      # - name: Setup LIME
+      #   run: |
+      #     python -m pip install --upgrade pip
+      #     pip install wheel
+      #     pip install git+https://github.com/sutt/lime.git@setup
+
+      # - name: Run LIME check
+      #   env:
+      #     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      #   run: |
+      #     lime check
+
+      # - name: Run LIME on lime dir
+      #   env:
+      #     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      #   run: |
+      #     cd lime-sheets
+      #     lime eval . -v

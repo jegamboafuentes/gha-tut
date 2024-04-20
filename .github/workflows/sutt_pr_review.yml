@@ -2,7 +2,11 @@ name: Contirbutor requests review - Check payment
 
 on:
   pull_request_target:
-    types: [review_requested, review_request_removed]
+    types: [review_requested]
+
+permissions:
+  issues: write
+  pull-requests: write
 
 jobs:
   check_that_payment:
@@ -15,6 +19,7 @@ jobs:
       - name: Check payment Endpoint
         env:
           INVOICE_KEY: ${{ secrets.INVOICE_KEY_1 }}
+        id: check_payment
         run: |
           checking_id="d810916c125b1eb8b25c9133e2d32c5997ce3094e9f4216982180e02f58e06e2"
           response=$(curl -s -X GET \
@@ -31,23 +36,43 @@ jobs:
           # Use the extracted value in the next step
           echo "::set-output name=is_paid::$is_paid"
 
-          # TODO - if/else on is_paid
-          # if True, echo yes, if False trigger a dismiss on review_request
-
       - name: Handle Payment Status
         if: steps.check_payment.outputs.is_paid == 'true'
         run: |
           echo "Payment is confirmed. Proceeding with the review request."
       
-      - name: Dismiss Review Request
+      - name: Contrib HAS paid
         if: steps.check_payment.outputs.is_paid == 'false'
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            github.pulls.dismissReviewRequest({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-                pull_number: context.issue.number,
-                reviewers: [context.payload.requested_reviewer.login]
-              })
+            const message = `Payment has been recieved, sit tight, running openai query`;
+            github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: message
+              });
+      
+      - name: Contrib has NOT paid
+        if: steps.check_payment.outputs.is_paid == 'false'
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const message = `You haven't paid yet bro; close then re-open the review request`;
+            github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: message
+              });
+            
+            
+    # github.pulls.dismissReviewRequest({
+    #   owner: context.repo.owner,
+    #   repo: context.repo.repo,
+    #     pull_number: context.issue.number,
+    #     reviewers: [context.payload.requested_reviewer.login]
+    #   })

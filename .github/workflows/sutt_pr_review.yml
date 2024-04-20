@@ -35,19 +35,19 @@ jobs:
           # if True, echo yes, if False trigger a dismiss on review_request
 
       - name: Handle Payment Status
-          if: steps.check_payment.outputs.is_paid == 'true'
-          run: |
-            echo "Payment is confirmed. Proceeding with the review request."
+        if: steps.check_payment.outputs.is_paid == 'true'
+        run: |
+          echo "Payment is confirmed. Proceeding with the review request."
       
       - name: Dismiss Review Request
-          if: steps.check_payment.outputs.is_paid == 'false'
-          uses: actions/github-script@v6
-          with:
-            github-token: ${{ secrets.GITHUB_TOKEN }}
-            script: |
-              github.pulls.dismissReviewRequest({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                  pull_number: context.issue.number,
-                  reviewers: [context.payload.requested_reviewer.login]
-                })
+        if: steps.check_payment.outputs.is_paid == 'false'
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.pulls.dismissReviewRequest({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+                pull_number: context.issue.number,
+                reviewers: [context.payload.requested_reviewer.login]
+              })

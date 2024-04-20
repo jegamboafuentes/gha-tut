@@ -1,14 +1,53 @@
-name: Contirbutor requests review demo
+name: Contirbutor requests review: Check payment
 
 on:
   pull_request_target:
     types: [review_requested, review_request_removed]
 
 jobs:
-  make_request:
+  check_that_payment:
     runs-on: ubuntu-latest
     steps:
   
-      - name: Hello World Step
+      - name: Echo Confirmation
         run: echo "review requested or review removed"
 
+      - name: Check payment Endpoint
+        env:
+          INVOICE_KEY: ${{ secrets.INVOICE_KEY_1 }}
+        run: |
+          checking_id="d810916c125b1eb8b25c9133e2d32c5997ce3094e9f4216982180e02f58e06e2"
+          response=$(curl -s -X GET \
+              -H "X-Api-Key: $INVOICE_KEY" \
+              -H "Content-Type: application/json" \
+              https://d5aedbf627.d.voltageapp.io/api/v1/payments/$checking_id)
+          echo "Server response:"
+          echo "$response"
+
+          # get is_paid which is bool
+          is_paid=$(echo "$response" | jq -r '.paid')
+          echo "payment_request: $payment_request"
+
+          # Use the extracted value in the next step
+          echo "::set-output name=is_paid::$is_paid"
+
+          # TODO - if/else on is_paid
+          # if True, echo yes, if False trigger a dismiss on review_request
+
+      - name: Handle Payment Status
+          if: steps.check_payment.outputs.is_paid == 'true'
+          run: |
+            echo "Payment is confirmed. Proceeding with the review request."
+      
+      - name: Dismiss Review Request
+          if: steps.check_payment.outputs.is_paid == 'false'
+          uses: actions/github-script@v6
+          with:
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+            script: |
+              github.pulls.dismissReviewRequest({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                  pull_number: context.issue.number,
+                  reviewers: [context.payload.requested_reviewer.login]
+                })

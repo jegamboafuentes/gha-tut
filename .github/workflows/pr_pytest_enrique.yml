@@ -1,8 +1,6 @@
 name: Write Comment on Push 1
 
-on:
-  pull_request_target:
-    types: [opened]  
+on: [push]  # This workflow triggers on a push event to the repository.
 
 permissions:
   issues: write
@@ -16,10 +14,10 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            const message = "Hola mundo 2.1";
+            const message = "Hola mundo";
             github.rest.issues.createComment({
               owner: "MIT-Bitcoin-2024",
               repo: "gha-tut",
               issue_number: "1",
               body: message
-            }); 
+            });

@@ -76,19 +76,24 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           # OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           script: |
-            const openai = require('openai');
-            openai.apiKey = '${{ secrets.OPENAI_API_KEY }}';
-
+            const request = require('@octokit/request').request;
+            const apiKey = '${{ secrets.OPENAI_API_KEY }}';
             const prompt = 'Q: What is the largest planet? A:';
 
             try {
-              const response = await openai.Completion.create({
-                engine: 'text-davinci-002',
-                prompt: prompt,
-                max_tokens: 100,
-                n: 1,
-                stop: null,
-                temperature: 0.7,
+              const response = await request('POST https://api.openai.com/v1/completions', {
+                headers: {
+                  'Authorization': `Bearer ${apiKey}`,
+                  'Content-Type': 'application/json'
+                },
+                data: JSON.stringify({
+                  model: 'text-davinci-002',
+                  prompt: prompt,
+                  max_tokens: 100,
+                  n: 1,
+                  stop: null,
+                  temperature: 0.7
+                })
               });
 
               const message = response.choices[0].text.trim();

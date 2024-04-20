@@ -42,4 +42,21 @@ jobs:
         run: |
           echo "Extracted value 1 from previous step: ${{ steps.extract_values.outputs.payment_request }}"
           echo "Extracted value 2 from previous step: ${{ steps.extract_values.outputs.checking_id }}"
+            - name: Leave_a_comment_on_the_PR
+      
+      - name: write_to_pr
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const message = `Extracted values:
+            - payment_req: ${{ steps.extract_values.outputs.payment_request }}
+            - checking_id: ${{ steps.extract_values.outputs.checking_id }}`;
+            
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: message
+            });
 

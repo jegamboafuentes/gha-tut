@@ -1,13 +1,13 @@
 name: Write Comment on Push 1
 
-on: [push]  # This workflow triggers on a push event to the repository.
+on: [push] # This workflow triggers on a push event to the repository.
 
 permissions:
   issues: write
 
 jobs:
   write_to_comment:
-    runs-on: ubuntu-latest  # Specifies the runner.
+    runs-on: ubuntu-latest # Specifies the runner.
     steps:
       - name: Leave a comment on the Issue6
         uses: actions/github-script@v6

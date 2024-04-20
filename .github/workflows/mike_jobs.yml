@@ -5,6 +5,7 @@ name: Run pytest on PR files
       - opened
     branches:
       - master
+      - mike-branch
 jobs:
   basic_pytest:
     runs-on: ubuntu-latest

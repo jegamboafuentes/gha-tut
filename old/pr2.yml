@@ -1,0 +1,87 @@
+name: Get Context on PR
+
+on:
+  pull_request_target:
+    types: [opened]  # This workflow triggers when a pull request is opened.
+
+permissions:
+  issues: write
+
+jobs:
+  new_welcome_message:
+    runs-on: ubuntu-latest  # Specifies the runner.
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Ensure all history is checked out
+  
+      # - name: List all modified files
+      #   id: files
+      #   run: |
+      #     echo "Files changed:"
+      #     git fetch origin ${{github.event.pull_request.base.sha}}:${{github.event.pull_request.base.ref}}
+      #     git diff --name-only ${{github.event.pull_request.base.sha}} ${{github.sha}} | grep '\.md$'
+      #     FILES=$(git diff --name-only ${{github.event.pull_request.base.sha}} ${{github.sha}} | grep '\.md$')
+      #     echo "::set-output name=all_md_files::$FILES"
+
+      # - name: Read and echo the content of a Markdown file
+      #   run: |
+      #     FILE_TO_READ=$(echo ${{ steps.files.outputs.all_md_files }} | cut -d ' ' -f 1)
+      #     if [ ! -z "$FILE_TO_READ" ]; then
+      #       CONTENT=$(cat $FILE_TO_READ)
+      #       echo "Content of $FILE_TO_READ:"
+      #       echo "$CONTENT"
+      #       echo "::set-env name=MD_CONTENT::$CONTENT"
+      #     else
+      #       echo "No Markdown files were changed."
+      #     fi
+
+
+      # - name: Set context as env var
+      #   env:
+      #     GITHUB_CONTEXT: ${{ toJson(github) }}
+      #   run: echo "$GITHUB_CONTEXT"
+      
+      # - name: Print relevant vars
+      #   uses: actions/github-script@v7
+      #   with:
+      #     script: |
+      #       pr_number = context.payload.number;
+      #       repo_owner = github.repository_owner;
+      #       repo_name = context.payload.pull_request.base.repo.name;
+      #       console.log("pr_number: " + pr_number + " repo_owner" + repo_owner + " repo_name:" + repo_name);
+            
+
+      # - name: Print context using github-script
+      #   uses: actions/github-script@v7
+      #   with:
+      #     script: console.log(JSON.stringify(context, null, 2))
+
+      # - name: Leave a comment on the PR
+      #   uses: actions/github-script@v6
+      #   with:
+      #     github-token: ${{secrets.GITHUB_TOKEN}}
+      #     script: |
+      #       const message = "Writing from Actions PR2";
+      #       github.rest.issues.createComment({
+      #         owner: "SuttGHA",
+      #         repo: "my-gha-1",
+      #         issue_number: "6",
+      #         body: message
+      #       });
+
+        # with:
+        #   github-token: ${{secrets.GITHUB_TOKEN}}
+        #   script: |
+        #     const issue_number = context.payload.pull_request.number;
+        #     const owner = context.repo.owner;
+        #     const repo = context.repo.repo;
+        #     const message = "Thank you for your contribution! We will review it as soon as possible. 😊";
+        #     github.rest.issues.createComment({
+        #       owner,
+        #       repo,
+        #       issue_number,
+        #       body: message
+        #     });

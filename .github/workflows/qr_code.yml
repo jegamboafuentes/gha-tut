@@ -1,8 +1,8 @@
 name: Focusing on requests
 "on":
   pull_request_target:
-    types: [opened]
-
+    types:
+      - opened
 permissions:
   issues: write
   pull-requests: write
@@ -35,17 +35,14 @@ jobs:
           # Use the extracted value in the next step
           echo "::set-output name=payment_request::$payment_request"
           echo "::set-output name=checking_id::$checking_id"
-
         id: extract_values
       - name: Use_extracted_values
-        run: |
+        run: >
           echo "Extracted value 1 from previous step: ${{
           steps.extract_values.outputs.payment_request }}"
 
-
           echo "Extracted value 2 from previous step: ${{
           steps.extract_values.outputs.checking_id }}"
-
       - name: write_to_pr
         uses: actions/github-script@v6
         with:
@@ -53,7 +50,9 @@ jobs:
           script: |
             const message = `Extracted values:
             - payment_req: ${{ steps.extract_values.outputs.payment_request }}
-            - checking_id: ${{ steps.extract_values.outputs.checking_id }}`;
+            - checking_id: ${{ steps.extract_values.outputs.checking_id }}
+
+            ![QR Code](./assets/bitcoin.svg)`;
 
             github.rest.issues.createComment({
               owner: context.repo.owner,

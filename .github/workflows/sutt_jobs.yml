@@ -1,0 +1,15 @@
+name: Focusing on requests
+
+on:
+  pull_request_target:
+    types: [opened]  
+
+jobs:
+  make request:
+    runs-on: ubuntu-latest
+    steps:
+  
+      - name: list files
+        run: |
+          ls -R
+

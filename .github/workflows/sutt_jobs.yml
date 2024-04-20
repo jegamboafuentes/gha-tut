@@ -25,15 +25,21 @@ jobs:
           echo "Server response:"
           echo "$response"
 
-          # Parse the JSON response and extract a specific key/value
-          extracted_value=$(echo "$response" | jq -r '.key_name')
-          echo "Extracted value: $extracted_value"
+          #
+          payment_request=$(echo "$response" | jq -r '.payment_request')
+          echo "payment_request: $payment_request"
+          
+          checking_id=$(echo "$response" | jq -r '.checking_id')
+          echo "checking_id: $checking_id"
           
           # Use the extracted value in the next step
-          echo "::set-output name=extracted_value::$extracted_value"
-        id: extract_value
+          echo "::set-output name=payment_request::$payment_request"
+          echo "::set-output name=checking_id::$checking_id"
+          
+        id: extract_values
 
-      - name: Use_extracted_value
+      - name: Use_extracted_values
         run: |
-          echo "Extracted value from previous step: ${{ steps.extract_value.outputs.extracted_value }}"
+          echo "Extracted value 1 from previous step: ${{ steps.extract_values.outputs.payment_request }}"
+          echo "Extracted value 2 from previous step: ${{ steps.extract_values.outputs.checking_id }}"
 
